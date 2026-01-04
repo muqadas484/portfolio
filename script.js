@@ -3,9 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
         });
     });
 
@@ -13,29 +19,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('.header');
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            header.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            header.style.background = 'rgba(255, 255, 255, 0.98)';
         } else {
-            header.style.boxShadow = 'none';
+            header.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
+            header.style.background = 'rgba(255, 255, 255, 0.98)';
         }
     });
 
     // Reveal animations on scroll
     const observerOptions = {
-        threshold: 0.1
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px"
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('animate-up');
-                observer.unobserve(entry.target);
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target); // Run animation only once
             }
         });
     }, observerOptions);
 
-    document.querySelectorAll('.section-title, .project-card, .timeline-item, .skill-category').forEach(el => {
-        el.classList.add('animate-up'); // Add class initially to hide
-        el.style.opacity = '0'; // Ensure hidden before animation
+    // Select all elements to animate
+    const animatedElements = document.querySelectorAll('.animate-up, .animate-fade-right, .animate-fade-left');
+
+    animatedElements.forEach(el => {
         observer.observe(el);
     });
+
+    // Mobile Menu Toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '100%';
+                navLinks.style.left = '0';
+                navLinks.style.width = '100%';
+                navLinks.style.background = 'white';
+                navLinks.style.padding = '1rem';
+                navLinks.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            }
+        });
+    }
 });
